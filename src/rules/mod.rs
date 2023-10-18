@@ -71,6 +71,25 @@ pub fn parse_rules(file_path: PathBuf) -> Vec<Rule> {
     parsed_rules
 }
 
+pub fn parse_rules_dir(dir_path: PathBuf) -> Vec<Rule> {
+    let mut parsed_rules: Vec<Rule> = Vec::new();
+
+    for entry in std::fs::read_dir(dir_path).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if path.is_dir() {
+            let mut dir_rules = parse_rules_dir(path);
+            parsed_rules.append(&mut dir_rules);
+        } else if path.ends_with(".rules") {
+            let mut file_rules = parse_rules(path);
+            parsed_rules.append(&mut file_rules);
+        }
+    }
+
+    parsed_rules
+}
+
 pub fn match_rule(rules: &Vec<Rule>, query: &str) -> bool {
     for rule in rules {
         let mut match_rule;
