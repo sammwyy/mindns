@@ -5,6 +5,7 @@ use crate::networking::server::run_server_on;
 pub mod dns;
 pub mod networking;
 pub mod protocol;
+pub mod rules;
 
 #[tokio::main]
 async fn main() -> Result<()> {
