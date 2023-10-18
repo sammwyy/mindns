@@ -1,0 +1,4 @@
+{
+  "rust-analyzer.linkedProjects": [".\\Cargo.toml"],
+  "cmake.configureOnOpen": false
+}
