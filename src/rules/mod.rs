@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use crate::{config::RulesSettings, utils};
+
 const A_DENY: u8 = 0;
 const A_REPLACE: u8 = 1;
 const A_APPEND: u8 = 2;
@@ -23,7 +25,7 @@ pub fn parse_rule(raw: &str) -> Rule {
         "deny" => A_DENY,
         "repl" => A_REPLACE,
         "apnd" => A_APPEND,
-        _ => panic!("Invalid action"),
+        _ => panic!("Invalid action {}", rule[0]),
     };
     let raw_key = rule[1].to_string().replace("!", "");
     let mode = if raw_key.starts_with("*") {
@@ -51,7 +53,7 @@ pub fn parse_rule(raw: &str) -> Rule {
 }
 
 fn ignore_line(line: &str) -> bool {
-    line.starts_with("#") || line.is_empty()
+    line.starts_with("#") || line.trim().is_empty()
 }
 
 pub fn parse_rules(file_path: PathBuf) -> Vec<Rule> {
@@ -81,9 +83,27 @@ pub fn parse_rules_dir(dir_path: PathBuf) -> Vec<Rule> {
         if path.is_dir() {
             let mut dir_rules = parse_rules_dir(path);
             parsed_rules.append(&mut dir_rules);
-        } else if path.ends_with(".rules") {
+        } else if entry.file_name().to_str().unwrap().ends_with(".rules") {
             let mut file_rules = parse_rules(path);
             parsed_rules.append(&mut file_rules);
+        }
+    }
+
+    parsed_rules
+}
+
+pub fn parse_rules_config(config: &Vec<RulesSettings>) -> Vec<Rule> {
+    let mut parsed_rules: Vec<Rule> = Vec::new();
+
+    for rule_file in config {
+        let path = utils::get_path(&rule_file.path);
+
+        if rule_file.load_as == "file" {
+            let mut file_rules = parse_rules(path);
+            parsed_rules.append(&mut file_rules);
+        } else if rule_file.load_as == "dir" {
+            let mut dir_rules = parse_rules_dir(path);
+            parsed_rules.append(&mut dir_rules);
         }
     }
 
