@@ -3,6 +3,7 @@ use std::net::SocketAddr;
 use tokio::net::UdpSocket;
 
 use crate::{
+    config::ServerSettings,
     networking::handler::handle_query,
     protocol::{byte_packet_buffer::BytePacketBuffer, Result},
 };
@@ -19,7 +20,8 @@ pub async fn run_server(addr: SocketAddr) -> Result<()> {
     }
 }
 
-pub async fn run_server_on(addr: &str) -> Result<()> {
-    let addr = addr.parse::<SocketAddr>()?;
+pub async fn run_server_with_config(config: &ServerSettings) -> Result<()> {
+    let raw = format!("{}:{}", config.bind, config.port);
+    let addr = raw.parse::<SocketAddr>()?;
     run_server(addr).await
 }
