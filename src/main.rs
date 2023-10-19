@@ -1,6 +1,6 @@
 use protocol::Result;
 
-use crate::networking::server::run_server_with_config;
+use crate::networking::server::run_server;
 
 pub mod config;
 pub mod dns;
@@ -17,9 +17,14 @@ async fn main() -> Result<()> {
     let rules = rules::parse_rules_config(&config.rules);
     println!("Loaded {} rules.", rules.len());
 
+    for rule in &rules {
+        println!("{:?}", rule);
+    }
+
     println!(
         "Starting DNS server at udp://{}:{}",
         config.server.bind, config.server.port
     );
-    run_server_with_config(&config.server).await
+
+    run_server(&config, &rules).await
 }

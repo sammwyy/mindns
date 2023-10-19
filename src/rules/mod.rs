@@ -2,13 +2,12 @@ use std::path::PathBuf;
 
 use crate::{config::RulesSettings, utils};
 
-const A_DENY: u8 = 0;
-const A_REPLACE: u8 = 1;
-const A_APPEND: u8 = 2;
+pub const A_DENY: u8 = 0;
+pub const A_APPEND: u8 = 1;
 
-const M_EQUAL: u8 = 0;
-const M_END: u8 = 1;
-const M_START: u8 = 2;
+pub const M_EQUAL: u8 = 0;
+pub const M_END: u8 = 1;
+pub const M_START: u8 = 2;
 
 #[derive(Debug, Clone)]
 pub struct Rule {
@@ -23,7 +22,6 @@ pub fn parse_rule(raw: &str) -> Rule {
     let rule: Vec<&str> = raw.split(" ").collect();
     let action = match rule[0] {
         "deny" => A_DENY,
-        "repl" => A_REPLACE,
         "apnd" => A_APPEND,
         _ => panic!("Invalid action {}", rule[0]),
     };
@@ -110,34 +108,25 @@ pub fn parse_rules_config(config: &Vec<RulesSettings>) -> Vec<Rule> {
     parsed_rules
 }
 
-pub fn match_rule(rules: &Vec<Rule>, query: &str) -> bool {
+pub fn match_rule(rules: &Vec<Rule>, query: &str) -> Option<Rule> {
+    let mut matched_rule: Option<Rule> = None;
+
     for rule in rules {
-        let mut match_rule;
+        let mut matched = false;
 
-        match rule.mode {
-            M_EQUAL => match query == rule.key {
-                true => match_rule = true,
-                false => continue,
-            },
-            M_END => match query.ends_with(&rule.key) {
-                true => match_rule = true,
-                false => continue,
-            },
-            M_START => match query.starts_with(&rule.key) {
-                true => match_rule = true,
-                false => continue,
-            },
-            _ => panic!("Invalid mode"),
+        if rule.mode == M_EQUAL {
+            matched = query == rule.key;
+        } else if rule.mode == M_END {
+            matched = query.ends_with(&rule.key);
+        } else if rule.mode == M_START {
+            matched = query.starts_with(&rule.key);
         }
 
-        if rule.reverse {
-            match_rule = !match_rule;
-        }
-
-        if match_rule {
-            return true;
+        if matched {
+            matched_rule = Some(rule.clone());
+            break;
         }
     }
 
-    false
+    matched_rule
 }

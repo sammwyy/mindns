@@ -11,8 +11,7 @@ pub struct ServerSettings {
 #[derive(Deserialize)]
 pub struct MirrorSettings {
     pub enabled: bool,
-    pub primary: String,
-    pub secondary: Option<String>,
+    pub server: String,
 }
 
 #[derive(Deserialize)]
@@ -24,7 +23,7 @@ pub struct RulesSettings {
 #[derive(Deserialize)]
 pub struct Config {
     pub server: ServerSettings,
-    pub mirror: Option<MirrorSettings>,
+    pub mirror: MirrorSettings,
     pub rules: Vec<RulesSettings>,
 }
 
