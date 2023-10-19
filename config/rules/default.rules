@@ -1,0 +1,14 @@
+# Command types
+# deny: deny access to the domain
+# repl: replace the domain with another domain or ip address
+# apnd: append the domain with an ip address
+deny domain.com
+apnd *.redirect.com 127.0.0.1
+
+# Match types
+# domain.com: exact match
+# *.domain.com: wildcard match
+# *: match all domains
+deny domain.com
+deny domain.com.*
+deny *.domain.com

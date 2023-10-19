@@ -1,0 +1,20 @@
+# Server settings.
+[server]
+port = 53
+bind = "127.0.0.1"
+
+# Mirror settings.
+[mirror]
+enabled = true
+server = "8.8.8.8"
+
+# Rules settings.
+[[rules]]
+load_as = "dir"
+path = "./rules"
+
+# Logging settings.
+[log]
+level = "info"
+save_as = "dir"
+path = "./logs"
