@@ -22,6 +22,8 @@ fn lookup(qname: &str, qtype: QueryType, server: (Ipv4Addr, u16)) -> Result<DnsP
     socket.send_to(&req_buffer.buf[0..req_buffer.pos], server)?;
 
     let mut res_buffer = BytePacketBuffer::new();
+    // Add timeout to recv_from.
+    socket.set_read_timeout(Some(std::time::Duration::from_secs(5)))?;
     socket.recv_from(&mut res_buffer.buf)?;
 
     DnsPacket::from_buffer(&mut res_buffer)
@@ -33,7 +35,7 @@ pub fn recursive_lookup(dns_server: &str, qname: &str, qtype: QueryType) -> Resu
 
     // Since it might take an arbitrary number of steps, we enter an unbounded loop.
     loop {
-        println!("attempting lookup of {:?} {} with ns {}", qtype, qname, ns);
+        log::info!("Attempting {:?} {} with ns {}", qtype, qname, ns);
 
         // The next step is to send the query to the active server.
         let ns_copy = ns;

@@ -2,25 +2,25 @@ use std::path::PathBuf;
 
 use serde_derive::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct ServerSettings {
     pub port: u16,
     pub bind: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct MirrorSettings {
     pub enabled: bool,
     pub server: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct RulesSettings {
     pub load_as: String,
     pub path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Config {
     pub server: ServerSettings,
     pub mirror: MirrorSettings,

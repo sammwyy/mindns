@@ -1,6 +1,4 @@
-use std::net::{Ipv4Addr, SocketAddr};
-
-use tokio::net::UdpSocket;
+use std::{net::Ipv4Addr, sync::Arc};
 
 use crate::{
     config::Config,
@@ -11,6 +9,8 @@ use crate::{
     },
     rules::{match_rule, Rule, A_APPEND, A_DENY},
 };
+
+use super::peer::UdpPeer;
 
 pub async fn handle_query(
     config: &Config,
@@ -54,7 +54,7 @@ pub async fn handle_query(
 
     if mirror_enabled {
         let result = recursive_lookup(mirror_ns, &question.name, question.qtype);
-        println!("Mirror result: {:?}", result);
+
         if let Ok(result) = result {
             out.header.rescode = result.header.rescode;
 
@@ -71,6 +71,8 @@ pub async fn handle_query(
                     out.resources.push(rec);
                 }
             }
+        } else {
+            out.header.rescode = ResultCode::SERVFAIL;
         }
     }
 }
@@ -78,8 +80,7 @@ pub async fn handle_query(
 pub async fn handle_request(
     config: &Config,
     rules: &Vec<Rule>,
-    socket: &UdpSocket,
-    peer: SocketAddr,
+    peer: &Arc<UdpPeer>,
     buffer: &mut BytePacketBuffer,
 ) -> Result<()> {
     let mut request = DnsPacket::from_buffer(buffer)?;
@@ -91,6 +92,13 @@ pub async fn handle_request(
     packet.header.response = true;
 
     if let Some(question) = request.questions.pop() {
+        log::info!(
+            "Client {} requested {:?} {}",
+            peer.addr,
+            question.qtype,
+            question.name,
+        );
+
         packet.questions.push(question.clone());
         handle_query(config, rules, &question, &mut packet).await;
     } else {
@@ -103,6 +111,6 @@ pub async fn handle_request(
     let len = res_buffer.pos();
     let data = res_buffer.get_range(0, len)?;
 
-    socket.send_to(data, peer).await?;
+    peer.send(data).await?;
     Ok(())
 }
