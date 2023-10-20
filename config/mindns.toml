@@ -14,7 +14,7 @@ load_as = "dir"
 path = "./rules"
 
 # Logging settings.
-[log]
+[logs]
 level = "info"
-save_as = "dir"
+save_as = "dir" # none, dir, file
 path = "./logs"

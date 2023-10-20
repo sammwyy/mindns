@@ -21,10 +21,18 @@ pub struct RulesSettings {
 }
 
 #[derive(Clone, Deserialize)]
+pub struct LoggingSettings {
+    pub level: String,
+    pub save_as: String,
+    pub path: String,
+}
+
+#[derive(Clone, Deserialize)]
 pub struct Config {
     pub server: ServerSettings,
     pub mirror: MirrorSettings,
     pub rules: Vec<RulesSettings>,
+    pub logs: LoggingSettings,
 }
 
 pub fn load_config(path: PathBuf) -> Config {

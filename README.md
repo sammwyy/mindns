@@ -4,12 +4,13 @@ MinDNS is a minimal DNS server written in Rust. It is intended to be used as a f
 
 ## ⚡ Features
 
+- [x] Fully asynchronous
+- [x] High performance
 - [x] DNS over UDP
 - [ ] DNS over TCP
-- [x] Blocking certain domains
-- [x] Replacing certain domains with other domains
-- [x] Add custom DNS records
-- [x] Added logging
+- [x] Block certain domains
+- [x] Custom DNS records
+- [x] Logging
 - [x] Mirroring from another DNS servers
 - [ ] DNSSEC
 
